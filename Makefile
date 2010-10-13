@@ -687,3 +687,21 @@ $(shell mkdir $(OBJDIR) 2>/dev/null)
 build elf hex eep lss sym coff extcoff doxygen clean          \
 clean_list clean_doxygen program dfu flip flip-ee dfu-ee      \
 debug gdb-config
+
+# Special rules for generating hex files for various devices and clock speeds
+ALLHEXFILES = hexfiles/mega168_16mhz.hex hexfiles/mega168_20mhz.hex\
+	hexfiles/mega328p_16mhz.hex hexfiles/mega328p_20mhz.hex
+
+allhexfiles: $(ALLHEXFILES)
+	$(MAKE) clean
+	avr-size hexfiles/*.hex
+
+$(ALLHEXFILES):
+	@[ -d hexfiles ] || mkdir hexfiles
+	@device=`echo $@ | sed -e 's|.*/mega||g' -e 's|_.*||g'`; \
+	clock=`echo $@ | sed -e 's|.*_||g' -e 's|mhz.*||g'`; \
+	addr=`echo $$device | sed -e 's/\([0-9]\)8/\1/g' | awk '{printf("%x", ($$1 - 2) * 1024)}'`; \
+	echo "### Make with F_CPU=$${clock}000000 MCU=atmega$$device BOARD=ArduinoDuemilanove"; \
+	$(MAKE) clean; \
+	$(MAKE) F_CPU=$${clock}000000 MCU=atmega$$device BOARD=ArduinoDuemilanove
+	mv $(TARGET).hex $@
