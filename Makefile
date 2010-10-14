@@ -69,9 +69,10 @@ BOARD  = ArduinoDuemilanove
 DEBUG_LEVEL = 1
 
 # VERSION are 
-# 	1=PSGROOVE 	-file from psgroove,
-# 	2=HERMES_V3 	-file from hermes v3 
-VERSION = 2
+# 	1=PSGROOVE 			-file from psgroove,
+# 	2=HERMES_V3 			-file from hermes v3 
+# 	3=HERMES_V3 with pkgdemo	-file from hermes v3 
+VERSION = 3
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the 
