@@ -2,7 +2,7 @@
 *.sym
 *.map
 *.lss
-#*.hex
+*.hex
 *.elf
 *.eep
 *.o

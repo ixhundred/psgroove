@@ -27,7 +27,11 @@
 #include "config.h"
 #include "psgroove.h"
 
+#if VERSION == HERMES_V3
+#include "descriptor-hermes-v3.h"
+#else
 #include "descriptor.h"
+#endif
 #include "usb_utils.h"
 #include "oddebug.h"
 

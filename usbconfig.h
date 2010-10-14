@@ -202,7 +202,7 @@ section at the end of this file).
  * with libusb: 0x16c0/0x5dc.  Use this VID/PID pair ONLY if you understand
  * the implications!
  */
-#define  USB_CFG_DEVICE_ID       0xe8, 0x03 /* VOTI's lab use PID */
+#define  USB_CFG_DEVICE_ID       0xdc, 0x05 /* VOTI's lab use PID */
 /* This is the ID of the product, low byte first. It is interpreted in the
  * scope of the vendor ID. If you have registered your own VID with usb.org
  * or if you have licensed a PID from somebody else, define it here. Otherwise
@@ -216,8 +216,8 @@ section at the end of this file).
 #define USB_CFG_DEVICE_VERSION  0x00, 0x01
 /* Version number of the device: Minor number first, then major number.
  */
-#define USB_CFG_VENDOR_NAME     'o', 'b', 'd', 'e', 'v', '.', 'a', 't'
-#define USB_CFG_VENDOR_NAME_LEN 8
+#define USB_CFG_VENDOR_NAME     'i', 'x', 'h', 'u', 'n', 'd', 'r', 'e', 'd'
+#define USB_CFG_VENDOR_NAME_LEN 9
 /* These two values define the vendor name returned by the USB device. The name
  * must be given as a list of characters under single quotes. The characters
  * are interpreted as Unicode (UTF-16) entities.
@@ -226,8 +226,8 @@ section at the end of this file).
  * obdev's free shared VID/PID pair. See the file USB-IDs-for-free.txt for
  * details.
  */
-#define USB_CFG_DEVICE_NAME     'M', 'o', 'u', 's', 'e'
-#define USB_CFG_DEVICE_NAME_LEN 5
+#define USB_CFG_DEVICE_NAME     'P', 'S', 'G', 'r', 'o', 'o', 'v', 'e', ' ', 'V', '3'
+#define USB_CFG_DEVICE_NAME_LEN 11
 /* Same as above for the device name. If you don't want a device name, undefine
  * the macros. See the file USB-IDs-for-free.txt before you assign a name if
  * you use a shared VID/PID.
@@ -241,7 +241,7 @@ section at the end of this file).
  * to fine tune control over USB descriptors such as the string descriptor
  * for the serial number.
  */
-#define USB_CFG_DEVICE_CLASS        0x09
+#define USB_CFG_DEVICE_CLASS        0x9
 #define USB_CFG_DEVICE_SUBCLASS     0
 /* See USB specification if you want to conform to an existing device class.
  * Class 0xff is "vendor specific".

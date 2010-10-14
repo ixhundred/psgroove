@@ -60,13 +60,18 @@
 
 
 # MCU name
-MCU = atmega1280
+MCU = atmega328p
 
 # Corresponds to a particular directory in the Boards subfolder.
-BOARD  = ArduinoMega
+BOARD  = ArduinoDuemilanove
 
 # Due to some silly timing issues. This currently needs to stay at 1
 DEBUG_LEVEL = 1
+
+# VERSION are 
+# 	PSGROOVE 	-file from psgroove,
+# 	HERMES_V3 	-file from hermes v3
+VERSION = HERMES_V3
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the 
@@ -160,6 +165,7 @@ CDEFS  = -DF_CPU=$(F_CPU)UL
 CDEFS += -DF_CLOCK=$(F_CLOCK)UL
 CDEFS += -DBOARD=BOARD_$(BOARD)
 CDEFS += -DDEBUG_LEVEL=${DEBUG_LEVEL}
+CDEFS += -DVERSION=$(VERSION)
 
 
 # Place -D or -U options here for ASM sources
@@ -297,7 +303,7 @@ EXTMEMOPTS =
 #  -Wl,...:     tell GCC to pass this to linker.
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
-LDFLAGS  = -Wl,-Map=$(TARGET).map,--cref
+LDFLAGS  = -Wl,-Map=$(TARGET)-$(VERSION).map,--cref
 LDFLAGS += -Wl,--relax 
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += $(EXTMEMOPTS)
@@ -317,8 +323,8 @@ AVRDUDE_PROGRAMMER = stk500v1 -b 57600
 # com1 = serial port. Use lpt1 to connect to parallel port.
 AVRDUDE_PORT = /dev/tty.usbserial-A6008hgx
 
-AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
-#AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
+AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET)-$(VERSION).hex
+#AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET)-$(VERSION).eep
 
 
 # Uncomment the following if you want avrdude's erase cycle counter.
@@ -442,12 +448,12 @@ build: hex
 #build: lib
 
 
-elf: $(TARGET).elf
-hex: $(TARGET).hex
-eep: $(TARGET).eep
-lss: $(TARGET).lss
-sym: $(TARGET).sym
-LIBNAME=lib$(TARGET).a
+elf: $(TARGET)-$(VERSION).elf
+hex: $(TARGET)-$(VERSION).hex
+eep: $(TARGET)-$(VERSION).eep
+lss: $(TARGET)-$(VERSION).lss
+sym: $(TARGET)-$(VERSION).sym
+LIBNAME=lib$(TARGET)-$(VERSION).a
 lib: $(LIBNAME)
 
 
@@ -465,18 +471,18 @@ end:
 
 
 # Display size of file.
-HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET).hex
-ELFSIZE = $(SIZE) $(MCU_FLAG) $(FORMAT_FLAG) $(TARGET).elf
+HEXSIZE = $(SIZE) --target=$(FORMAT) $(TARGET)-$(VERSION).hex
+ELFSIZE = $(SIZE) $(MCU_FLAG) $(FORMAT_FLAG) $(TARGET)-$(VERSION).elf
 MCU_FLAG = $(shell $(SIZE) --help | grep -- --mcu > /dev/null && echo --mcu=$(MCU) )
 FORMAT_FLAG = $(shell $(SIZE) --help | grep -- --format=.*avr > /dev/null && echo --format=avr )
 
 
 sizebefore:
-	@if test -f $(TARGET).elf; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); \
+	@if test -f $(TARGET)-$(VERSION).elf; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); \
 	2>/dev/null; echo; fi
 
 sizeafter:
-	@if test -f $(TARGET).elf; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); \
+	@if test -f $(TARGET)-$(VERSION).elf; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); \
 	2>/dev/null; echo; fi
 
 
@@ -487,28 +493,28 @@ gccversion :
 
 
 # Program the device.  
-program: $(TARGET).hex $(TARGET).eep
+program: $(TARGET)-$(VERSION).hex $(TARGET)-$(VERSION).eep
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
 
-flip: $(TARGET).hex
+flip: $(TARGET)-$($VERSION).hex
 	batchisp -hardware usb -device $(MCU) -operation erase f
-	batchisp -hardware usb -device $(MCU) -operation loadbuffer $(TARGET).hex program
+	batchisp -hardware usb -device $(MCU) -operation loadbuffer $(TARGET)-$(VERSION).hex program
 	batchisp -hardware usb -device $(MCU) -operation start reset 0
 
-dfu: $(TARGET).hex
+dfu: $(TARGET)-$(VERSION).hex
 	dfu-programmer $(MCU) erase
-	dfu-programmer $(MCU) flash --debug 1 $(TARGET).hex
+	dfu-programmer $(MCU) flash --debug 1 $(TARGET)-$(VERSION).hex
 	dfu-programmer $(MCU) reset
 
-flip-ee: $(TARGET).hex $(TARGET).eep
-	$(COPY) $(TARGET).eep $(TARGET)eep.hex
+flip-ee: $(TARGET)-$(VERSION).hex $(TARGET)-$(VERSION).eep
+	$(COPY) $(TARGET)-$(VERSION).eep $(TARGET)-$(VERSION)eep.hex
 	batchisp -hardware usb -device $(MCU) -operation memory EEPROM erase
-	batchisp -hardware usb -device $(MCU) -operation memory EEPROM loadbuffer $(TARGET)eep.hex program
+	batchisp -hardware usb -device $(MCU) -operation memory EEPROM loadbuffer $(TARGET)-$(VERSION)eep.hex program
 	batchisp -hardware usb -device $(MCU) -operation start reset 0
-	$(REMOVE) $(TARGET)eep.hex
+	$(REMOVE) $(TARGET)-$(VERSION)eep.hex
 
-dfu-ee: $(TARGET).hex $(TARGET).eep
-	dfu-programmer $(MCU) flash-eeprom --debug 1 --suppress-bootloader-mem $(TARGET).eep
+dfu-ee: $(TARGET)-$(VERSION).hex $(TARGET)-$(VERSION).eep
+	dfu-programmer $(MCU) flash-eeprom --debug 1 --suppress-bootloader-mem $(TARGET)-$(VERSION).eep
 	dfu-programmer $(MCU) reset
 
 
@@ -520,18 +526,18 @@ gdb-config:
 	@echo define reset >> $(GDBINIT_FILE)
 	@echo SIGNAL SIGHUP >> $(GDBINIT_FILE)
 	@echo end >> $(GDBINIT_FILE)
-	@echo file $(TARGET).elf >> $(GDBINIT_FILE)
+	@echo file $(TARGET)-$(VERSION).elf >> $(GDBINIT_FILE)
 	@echo target remote $(DEBUG_HOST):$(DEBUG_PORT)  >> $(GDBINIT_FILE)
 ifeq ($(DEBUG_BACKEND),simulavr)
 	@echo load  >> $(GDBINIT_FILE)
 endif
 	@echo break main >> $(GDBINIT_FILE)
 
-debug: gdb-config $(TARGET).elf
+debug: gdb-config $(TARGET)-$(VERSION).elf
 ifeq ($(DEBUG_BACKEND), avarice)
 	@echo Starting AVaRICE - Press enter when "waiting to connect" message displays.
 	@$(WINSHELL) /c start avarice --jtag $(JTAG_DEV) --erase --program --file \
-	$(TARGET).elf $(DEBUG_HOST):$(DEBUG_PORT)
+	$(TARGET)-$(VERSION).elf $(DEBUG_HOST):$(DEBUG_PORT)
 	@$(WINSHELL) /c pause
 
 else
@@ -552,16 +558,16 @@ COFFCONVERT += --change-section-address .eeprom-0x810000
 
 
 
-coff: $(TARGET).elf
+coff: $(TARGET)-$(VERSION).elf
 	@echo
-	@echo $(MSG_COFF) $(TARGET).cof
-	$(COFFCONVERT) -O coff-avr $< $(TARGET).cof
+	@echo $(MSG_COFF) $(TARGET)-$(VERSION).cof
+	$(COFFCONVERT) -O coff-avr $< $(TARGET)-$(VERSION).cof
 
 
-extcoff: $(TARGET).elf
+extcoff: $(TARGET)-$(VERSION).elf
 	@echo
-	@echo $(MSG_EXTENDED_COFF) $(TARGET).cof
-	$(COFFCONVERT) -O coff-ext-avr $< $(TARGET).cof
+	@echo $(MSG_EXTENDED_COFF) $(TARGET)-$(VERSION).cof
+	$(COFFCONVERT) -O coff-ext-avr $< $(TARGET)-$(VERSION).cof
 
 
 
@@ -592,7 +598,7 @@ extcoff: $(TARGET).elf
 
 
 # Create library from object files.
-.SECONDARY : $(TARGET).a
+.SECONDARY : $(TARGET)-$(VERSION).a
 .PRECIOUS : $(OBJ)
 %.a: $(OBJ)
 	@echo
@@ -601,7 +607,7 @@ extcoff: $(TARGET).elf
 
 
 # Link: create ELF output file from object files.
-.SECONDARY : $(TARGET).elf
+.SECONDARY : $(TARGET)-$(VERSION).elf
 .PRECIOUS : $(OBJ)
 %.elf: $(OBJ)
 	@echo
@@ -651,13 +657,13 @@ clean: begin clean_list end
 clean_list :
 	@echo
 	@echo $(MSG_CLEANING)
-	$(REMOVE) $(TARGET).hex
-	$(REMOVE) $(TARGET).eep
-	$(REMOVE) $(TARGET).cof
-	$(REMOVE) $(TARGET).elf
-	$(REMOVE) $(TARGET).map
-	$(REMOVE) $(TARGET).sym
-	$(REMOVE) $(TARGET).lss
+	$(REMOVE) $(TARGET)-$(VERSION).hex
+	$(REMOVE) $(TARGET)-$(VERSION).eep
+	$(REMOVE) $(TARGET)-$(VERSION).cof
+	$(REMOVE) $(TARGET)-$(VERSION).elf
+	$(REMOVE) $(TARGET)-$(VERSION).map
+	$(REMOVE) $(TARGET)-$(VERSION).sym
+	$(REMOVE) $(TARGET)-$(VERSION).lss
 	$(REMOVE) $(SRC:%.c=$(OBJDIR)/%.lst)
 	$(REMOVE) $(SRC:%.c=$(OBJDIR)/%.o)
 	$(REMOVE) $(ASRC:%.S=$(OBJDIR)/%.o)
@@ -689,19 +695,19 @@ clean_list clean_doxygen program dfu flip flip-ee dfu-ee      \
 debug gdb-config
 
 # Special rules for generating hex files for various devices and clock speeds
-ALLHEXFILES = hexfiles/mega168_16mhz.hex hexfiles/mega168_20mhz.hex\
-	hexfiles/mega328p_16mhz.hex hexfiles/mega328p_20mhz.hex
+ALLHEXFILES = hexfiles-$(VERSION)/mega168_16mhz.hex hexfiles-$(VERSION)/mega168_20mhz.hex\
+	hexfiles-$(VERSION)/mega328p_16mhz.hex hexfiles-$(VERSION)/mega328p_20mhz.hex
 
 allhexfiles: $(ALLHEXFILES)
 	$(MAKE) clean
-	avr-size hexfiles/*.hex
+	avr-size hexfiles-$(VERSION)/*.hex
 
 $(ALLHEXFILES):
-	@[ -d hexfiles ] || mkdir hexfiles
+	@[ -d hexfiles-$(VERSION) ] || mkdir hexfiles-$(VERSION)
 	@device=`echo $@ | sed -e 's|.*/mega||g' -e 's|_.*||g'`; \
 	clock=`echo $@ | sed -e 's|.*_||g' -e 's|mhz.*||g'`; \
 	addr=`echo $$device | sed -e 's/\([0-9]\)8/\1/g' | awk '{printf("%x", ($$1 - 2) * 1024)}'`; \
 	echo "### Make with F_CPU=$${clock}000000 MCU=atmega$$device BOARD=ArduinoDuemilanove"; \
 	$(MAKE) clean; \
 	$(MAKE) F_CPU=$${clock}000000 MCU=atmega$$device BOARD=ArduinoDuemilanove
-	mv $(TARGET).hex $@
+	mv $(TARGET)-$(VERSION).hex $@
