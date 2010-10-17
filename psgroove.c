@@ -31,8 +31,8 @@
 	#include "descriptor.h"
 //	#error "include psgroove"
 #else
-	#include "descriptor-hermes-v3.h"
-//	#error "include hermes-v3"
+	#include "descriptor-hermes.h"
+//	#error "include hermes"
 #endif
 #include "usb_utils.h"
 #include "oddebug.h"

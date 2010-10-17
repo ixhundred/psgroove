@@ -36,6 +36,9 @@ const uint8_t PROGMEM port1_short_config_descriptor[] = {
 #elif VERSION == 3
 	#include "port1_config_descriptor-v3-pkgdemo.h"
 //	#error "hermes v3 with pkgdemo"
+#elif VERSION == 4
+	#include "port1_config_descriptor-hermes-v4.h"
+//	#error "hermes v4"
 #endif
 
 const uint8_t PROGMEM port2_device_descriptor[] = {

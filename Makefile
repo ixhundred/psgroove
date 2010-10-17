@@ -71,8 +71,9 @@ DEBUG_LEVEL = 1
 # VERSION are 
 # 	1=PSGROOVE 			-file from psgroove,
 # 	2=HERMES_V3 			-file from hermes v3 
-# 	3=HERMES_V3 with pkgdemo	-file from hermes v3 
-VERSION = 3
+# 	3=HERMES_V3 with pkgdemo	-file from hermes v3 with pkgdemo
+# 	4=HERMES_V4 			-file from hermes v4 
+VERSION = 4
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the 
