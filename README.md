@@ -8,6 +8,7 @@ It should work on:
 
 - ATMega1280
 - ATMega168
+- ATMega328p
 
 ... and maybe more.
 
@@ -17,7 +18,8 @@ of unsigned third-party apps and games on the PS3.**
 
 Cloning
 -------
-    git clone git://github.com/psgroove/psgroove.git
+    git clone git://github.com/psgroove/psgroove.git for original
+    git clone git://github.com/ixhundred/psgroove.git for timwu-ixhundred version (for atmel avr that not support usb h/w)
 
 
 Configuring
@@ -34,7 +36,7 @@ Arduino Mega
 Arduino Duemilanove
 
     MCU = atmega168
-    BOARD = ArduinoDuemilanove
+    BOARD = ArduinoDuemilanove (default for ixhundred version, see the h/w circuit from timwu)
     F_CLOCK = 16000000
 
 Board-specific notes
